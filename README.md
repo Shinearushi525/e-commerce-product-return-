@@ -174,7 +174,11 @@ This system enables e-commerce companies to:
 | GitHub | Version control & portfolio |
 
 ---
-<p align="center">
-  ⭐ If you found this project helpful, please give it a star on GitHub!
-</p>
+
+## 👨‍💻 Author
+
+**Your Name**
+- 🎓 B.Tech Computer Science (AI and Data Science)
+- 📧 Arushigarg525@gmail.com
+- 🐙 [GitHub](https://github.com/Shinearushi525)
 
