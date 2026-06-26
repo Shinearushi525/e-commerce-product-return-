@@ -177,8 +177,20 @@ This system enables e-commerce companies to:
 
 ## 👨‍💻 Author
 
-**Your Name**
-- 🎓 B.Tech Computer Science (AI and Data Science)
-- 📧 Arushigarg525@gmail.com
-- 🐙 [GitHub](https://github.com/Shinearushi525)
+<div align="center">
 
+**Arushi Garg**
+
+*B.Tech Computer Science (AI and Data Science)*
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Arushi%20Garg-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/arushi-garg525/)
+[![GitHub](https://img.shields.io/badge/GitHub-Shinearushi525-000000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Shinearushi525)
+[![Email](https://img.shields.io/badge/Email-arushigarg525@gmail.com-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:Arushigarg525@gmail.com)
+
+</div>
+
+---
+
+<div align="center">
+
+</div>
