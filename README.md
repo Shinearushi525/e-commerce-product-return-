@@ -1,196 +1,71 @@
-# 🛒 Product Return Prediction System
-### Machine Learning · Data Science · E-Commerce Analytics
+# 🛒 Product Return Prediction — Streamlit App
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Python-3.10+-3776AB?style=for-the-badge&logo=python&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Scikit--Learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white"/>
-  <img src="https://img.shields.io/badge/XGBoost-FF6600?style=for-the-badge&logo=xgboost&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Pandas-150458?style=for-the-badge&logo=pandas&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Google%20Colab-F9AB00?style=for-the-badge&logo=googlecolab&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Status-Complete-2ECC71?style=for-the-badge"/>
-</p>
+An interactive Streamlit app built from the
+[e-commerce-product-return](https://github.com/Shinearushi525/e-commerce-product-return-)
+project. It trains a classifier on 15,000 synthetic Indian e-commerce orders and predicts
+whether a new order is likely to be **returned**.
 
----
+## What's included
+- `train_model.py` — feature engineering + trains 5 models (Logistic Regression, Decision
+  Tree, Random Forest, Gradient Boosting, XGBoost), picks the best by ROC-AUC, and saves
+  all artifacts (`model.pkl`, `scaler.pkl`, `encoders.pkl`, `feature_cols.pkl`,
+  `results.pkl`, `feature_importance.pkl`).
+- `app.py` — the Streamlit app with 4 pages:
+  1. **Overview & EDA** — return-rate charts by category, discount, payment method,
+     delivery days, a correlation heatmap, and return-reason breakdown.
+  2. **Model Performance** — leaderboard of all trained models and feature importances.
+  3. **Predict a Single Order** — a form to score one order interactively, with a risk gauge.
+  4. **Batch Prediction** — upload a CSV of orders and download the scored results.
+- `ecommerce_product_returns.csv` — the dataset.
+- `requirements.txt` — pinned dependencies.
 
-## 📌 Problem Statement
+> **Note on accuracy:** the original README quoted ~82% accuracy / ~89% ROC-AUC. Retraining
+> from the raw CSV in this repo, the real numbers come out lower (roughly 58-64% ROC-AUC
+> depending on model) — the dataset is synthetic and only weakly predictive. The app reports
+> whatever `train_model.py` actually measures, not the earlier marketing numbers, so what you
+> see in the "Model Performance" tab is the honest result.
 
-E-commerce companies like Amazon, Flipkart, and Meesho lose **billions of rupees annually** due to product returns. High return rates lead to:
-
-- 📦 Increased logistics & reverse-shipping costs
-- 🏭 Inventory management problems
-- 💸 Revenue loss and reduced profit margins
-- 😟 Poor customer experience
-
-**This project builds a Machine Learning model that predicts whether a product order will be returned — before it is shipped.** By identifying high-risk orders early, businesses can take proactive steps to reduce return rates.
-
----
-
-## 🎯 Objective
-
-> Predict the probability of a product being returned based on order features such as discount percentage, delivery time, payment method, product category, and customer behavior.
-
----
-
-## 📊 Dataset
-
-| Property | Value |
-|----------|-------|
-| **Source** | Custom-generated Indian E-Commerce Dataset |
-| **Rows** | 15,000 orders |
-| **Columns** | 19 features |
-| **Time Period** | January 2022 – December 2024 |
-| **Target Variable** | `is_returned` (0 = Not Returned, 1 = Returned) |
-| **Return Rate** | ~38.2% |
-
-### 📋 Features Overview
-
-| Feature | Description |
-|---------|-------------|
-| `order_id` | Unique order identifier |
-| `order_date` | Date of purchase |
-| `customer_age` | Age of customer (18–65) |
-| `customer_type` | New / Returning / Loyal |
-| `customer_city` | 18 Indian cities |
-| `product_category` | Electronics, Fashion, Home & Kitchen, etc. |
-| `product_subcategory` | Mobile Phones, Footwear, Cookware, etc. |
-| `product_price` | Price in ₹ (99 – 89,999) |
-| `discount_percent` | Discount applied (0% – 70%) |
-| `order_quantity` | Number of items ordered |
-| `payment_method` | UPI, COD, Credit Card, EMI, etc. |
-| `shipping_type` | Standard / Express / Same Day / Free |
-| `delivery_days` | Days taken to deliver (1–21) |
-| `seller_rating` | Seller rating (2.5 – 5.0) |
-| `customer_rating` | Customer-given rating (1–5) |
-| `warranty_available` | Yes / No |
-| `is_returned` | **Target: 0 or 1** |
-| `return_reason` | Why the order was returned |
-
----
-
-## 🔍 Exploratory Data Analysis (EDA)
-
-Key findings from the analysis:
-
-### 📦 Return Rate by Category
-> Fashion leads with **42.4%** return rate, primarily due to wrong size/fit issues.
-
-### 💸 Discount Effect
-> Orders with **50%+ discount** have nearly **2x higher return rate** than low-discount orders.
-> Heavy discounts encourage impulse buying, which leads to returns.
-
-### 🚚 Delivery Days
-> Return rate spikes significantly when delivery exceeds **7 days**.
-> On-time delivery is strongly correlated with customer satisfaction.
-
-### 💳 Payment Method
-> **Cash on Delivery (COD)** orders show the **highest return rate** — customers feel less committed when paying later.
-
-### 👤 Customer Type
-> **New customers** return 6% more than loyal customers.
-> Loyal customers show the lowest return rate.
-
-### 🔥 Correlation Highlights
-> `discount_percent` and `delivery_days` are the **strongest predictors** of product returns.
-
----
-
-## ⚙️ Feature Engineering
-
-9 new features were engineered to improve model performance:
-
-| New Feature | Logic |
-|-------------|-------|
-| `actual_price` | Price after applying discount |
-| `high_discount` | 1 if discount ≥ 40% |
-| `late_delivery` | 1 if delivery days > 5 |
-| `low_seller_rating` | 1 if seller rating < 3.5 |
-| `low_customer_rating` | 1 if customer rating ≤ 2 |
-| `premium_product` | 1 if price > ₹10,000 |
-| `order_month` | Month extracted from order date |
-| `festival_season` | 1 if order placed in Oct–Dec |
-| `is_cod` | 1 if payment method is Cash on Delivery |
-
----
-
-## 🤖 Models Trained & Compared
-
-Five classification models were trained and evaluated:
-
-| Model | Accuracy | F1 Score | ROC-AUC |
-|-------|----------|----------|---------|
-| Logistic Regression | ~72% | ~70% | ~78% |
-| Decision Tree | ~74% | ~73% | ~74% |
-| **Random Forest** | **~82%** | **~81%** | **~89%** |
-| Gradient Boosting | ~81% | ~80% | ~88% |
-| XGBoost | ~82% | ~81% | ~89% |
-
-> ✅ **Random Forest** and **XGBoost** emerged as the best-performing models.
-
----
-
-## 📈 Results
-
+## Run it locally
+```bash
+pip install -r requirements.txt
+python train_model.py      # generates the .pkl artifacts (run once)
+streamlit run app.py
 ```
-Best Model    : Random Forest / XGBoost
-Accuracy      : ~82%
-ROC-AUC Score : ~89%
-F1 Score      : ~81%
-Features Used : 24 (15 original + 9 engineered)
-```
+Then open the local URL Streamlit prints (usually http://localhost:8501).
 
-### 🔑 Top Predictive Features
-1. `discount_percent` — strongest return signal
-2. `delivery_days` — delivery delay drives returns
-3. `customer_rating` — dissatisfied customers return more
-4. `is_cod` — COD linked to higher return behavior
-5. `product_category` — Fashion has highest risk
-6. `seller_rating` — poor sellers → more returns
-7. `high_discount` — engineered flag for >40% discount
-8. `late_delivery` — engineered flag for delivery >5 days
+## Deploy it live (free, ~5 minutes) — Streamlit Community Cloud
 
----
-## 💡 Business Impact
+1. **Push this folder to a GitHub repo** (a new one, or update your existing
+   `e-commerce-product-return-` repo) with all the files above, **including the generated
+   `.pkl` files** (or let step 3 generate them — see note below).
+2. Go to **https://share.streamlit.io** and sign in with GitHub.
+3. Click **"New app"**, pick your repo/branch, and set the main file path to `app.py`.
+4. Click **Deploy**. Streamlit Cloud installs `requirements.txt` and starts the app —
+   you'll get a public URL like `https://your-app-name.streamlit.app`.
 
-This system enables e-commerce companies to:
+**About the `.pkl` files:** Streamlit Cloud's build step won't run `train_model.py` for you.
+Either:
+- commit the `.pkl` files you already generated locally, **or**
+- add one line at the top of `app.py`'s artifact loader to call `train_model.main()`
+  automatically the first time no `model.pkl` exists (simplest is to just commit the
+  `.pkl` files — they're small, a few MB at most).
 
-- 🎯 **Flag high-risk orders** before dispatch and offer alternatives
-- 💬 **Send targeted messages** to customers likely to return
-- 🏷️ **Limit COD** on high-discount + high-risk combinations
-- 📦 **Optimize packaging** for categories with high return rates
-- 📊 **Monitor seller performance** linked to returns
+## Other deployment options
+- **Hugging Face Spaces** (free): create a Space with SDK = Streamlit, push the same files.
+- **Render / Railway**: add a `Procfile` with
+  `web: streamlit run app.py --server.port $PORT --server.address 0.0.0.0`.
+- **Docker**: 
+  ```dockerfile
+  FROM python:3.11-slim
+  WORKDIR /app
+  COPY . .
+  RUN pip install -r requirements.txt
+  RUN python train_model.py
+  EXPOSE 8501
+  CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+  ```
 
----
-
-## 🧰 Tech Stack
-
-| Tool | Purpose |
-|------|---------|
-| Python 3.10+ | Core programming language |
-| Pandas & NumPy | Data manipulation |
-| Matplotlib & Seaborn | Data visualization |
-| Scikit-learn | ML models & evaluation |
-| XGBoost | Gradient boosting classifier |
-| Google Colab | Development environment |
-| GitHub | Version control & portfolio |
-
----
-
-## 👨‍💻 Author
-
-<div align="center">
-
-**Arushi Garg**
-
-*B.Tech Computer Science (AI and Data Science)*
-
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Arushi%20Garg-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/arushi-garg525/)
-[![GitHub](https://img.shields.io/badge/GitHub-Shinearushi525-000000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Shinearushi525)
-[![Email](https://img.shields.io/badge/Email-arushigarg525@gmail.com-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:Arushigarg525@gmail.com)
-
-</div>
-
----
-
-<div align="center">
-
-</div>
+## Tested
+This app was run locally end-to-end in this environment: training completed successfully
+and the Streamlit server started and responded with HTTP 200 / healthy status with no
+runtime errors.
